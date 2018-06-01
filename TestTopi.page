@@ -1,0 +1,139 @@
+<apex:page language="{!$CurrentPage.parameters.lang}" lightningStylesheets="true"
+           applyHtmlTag="true" showHeader="false" applyBodyTag="false" cache="false"
+           controller="TestTopiController">
+    
+	<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+        	<apex:includeScript value="{!$Resource.Jquery}" />
+            <apex:includeScript value="{!$Resource.Jquerymin}" />
+            <apex:includeScript value="{!$Resource.JqueryUI}" />
+            <apex:includeScript value="{!$Resource.JqueryMask}" />  
+            
+            <title>Topi</title>
+<style>
+.bgColor{
+    background-color: #137dbd;
+    color: #ffffff;
+} 
+table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+    table tr {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: .35em;
+}
+
+table th,
+table td {
+  padding: .625em;
+  text-align: center;
+}
+
+table th {
+  font-size: .85em;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}           
+</style>
+<script>
+var pegajson;
+var linguagem;
+function teste(){   
+linguagem = document.getElementById('linguagem').value; 
+$.getJSON( "https://api.github.com/search/repositories?q=language:" + linguagem + "&sort=stars", function( json ) {
+var table =  $('#myTable');    
+var max_size=json.items.length;
+var sta = 0;
+var elements_per_page = 3;
+var limit = elements_per_page;
+    table.empty();
+	goFun(sta,limit);
+function goFun(sta,limit){
+          		console.log(sta,limit);
+					for(var i=sta;i<limit;i++){
+					var tab='<tr><td><img src="'+json.items[i].owner.avatar_url+'" height="100" width="100">'+"\n"+'</td><td>'+json.items[i].name+"\n"+'</td><td>'+json.items[i].forks_count+"\n"+'</td><td>'
+					          +json.items[i].stargazers_count+"\n"+'</td>';
+						
+					 $('#myTable').append(tab)
+
+					}
+				}	
+$('#nextValue').click(function(){
+	var next = limit;
+	if(max_size>=next) {
+		def = limit+elements_per_page;
+        limit = def
+		table.empty();
+        if(limit > max_size) {
+        	def = max_size;
+        }
+        	goFun(next,def);
+		}
+	});
+$('#PreValue').click(function(){
+	var pre = limit-(2*elements_per_page);
+		if(pre>=0) {
+			limit = limit-elements_per_page;
+			table.empty();
+			goFun(pre,limit); 
+		}
+	});    
+ var number = Math.round(json.items.length / elements_per_page);    
+
+$('.nav button').click(function(){
+       var start = $(this).text();
+       table.empty();
+       limit = 3*(parseInt(start)+1) > max_size ? max_size: 3*(parseInt(start)+1)
+      goFun(start*3,limit); 
+ });       
+ });
+};             
+            
+</script>
+</head>        
+<apex:form id="form">
+    
+<apex:pageblock >
+	<input type="text" id="linguagem" />
+	<apex:commandButton value="Buscar Linguagem" onclick="teste()" action="{!consultalinguagem}" reRender="form" status="statuslinguagem"/>
+
+                            
+                               
+             <apex:page rendered="true"/>
+</apex:pageblock>  
+</apex:form>     
+    
+<div class="col-lg-12 col-md-12 col-xs-12 table-responsive" >
+	<table >
+		<thead>
+			<tr class="bgColor">
+                <td><b>Picture Profile</b></td>
+				<td><b>Name</b></td>
+				<td><b>Forks</b></td>
+				<td><b>Stars</b></td>
+			</tr>
+		</thead>
+		<tbody id="myTable">
+			 
+		</tbody>
+	</table>
+</div>
+<div class="col-lg-6 col-md-6 col-xs-12">
+    <div class="col-lg-2 col-md-2 col-xs-4">
+	<button class="col-lg-12 col-xs-12 " id="PreValue" style="font-size: 16px;float: left;">Anterior</button>
+	</div>
+  	<div class="col-lg-2  col-md-2 col-xs-4 nav">
+	</div>	
+	<div class="col-lg-2  col-md-2 col-xs-4">
+	<button class="col-lg-12 col-xs-12" id="nextValue" style="font-size: 16px; float: left;">Proxima</button>
+	</div>	
+</div>
+
+</html>        
+</apex:page>

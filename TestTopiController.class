@@ -1,0 +1,30 @@
+public class TestTopiController {
+
+    
+public String language {get; set;}
+public String repositoryName { get; set; }
+public String profilePicUrl { get; set; }
+public String forks { get; set; }
+public String Stars { get; set; }  
+public List<SelectOption> TipoLinguagem { get; set; }
+    
+    public  TestTopiController(){
+		
+        
+    }    
+    public void consultalinguagem(){
+       
+ 
+        Map<String, Object> mapjson = BuscaGit.getInstance().getGitByLanguage();
+        system.debug(mapjson);
+        if( mapjson != null ){
+            DadosJson__c dados = new DadosJson__c ();
+            dados.name = (String) mapjson.get( 'items.name' );
+           	insert dados;
+           
+        }
+        
+        
+    }
+    
+}
